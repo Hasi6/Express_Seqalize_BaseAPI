@@ -2,7 +2,7 @@ require('dotenv').config({ path: `.env` });
 require('module-alias/register');
 import 'reflect-metadata';
 import 'express-async-errors';
-import express, { Application, json, Request, Response } from 'express';
+import express, { Application, json } from 'express';
 import cors from 'cors';
 import { v4 as uuid } from 'uuid';
 import helmet from 'helmet';
@@ -11,7 +11,6 @@ import registerRoutes from '@routes/index';
 import { NotFoundError } from '@utils/execptions';
 import { errorHandler } from '@middlewares/error-handler';
 import loggerObj from '@utils/logger';
-import http from 'http';
 import { connectDB } from './data';
 
 const app: Application = express();
@@ -48,8 +47,6 @@ app.all('*', async () => {
 });
 
 app.use(errorHandler);
-
-const server = http.createServer(app);
 
 app.listen(PORT, async () => {
   console.log(`Server started at PORT: ${PORT}`);

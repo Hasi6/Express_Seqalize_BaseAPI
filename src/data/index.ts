@@ -4,13 +4,17 @@ import Post from '@data/post';
 
 const sequelize = new Sequelize({
   dialect: 'sqlite',
-  storage: 'path/to/database.sqlite',
+  storage: 'database.sqlite',
   models: [User, Post],
+  sync: {
+    alter: true,
+    force: true,
+  },
 });
 
 export async function connectDB() {
   try {
-    await sequelize.authenticate();
+    await sequelize.sync();
     console.log('Connection to the database has been established successfully.');
 
     // ... start your application here ...
