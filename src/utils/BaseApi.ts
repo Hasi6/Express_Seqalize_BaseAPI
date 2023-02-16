@@ -1,6 +1,9 @@
 import { Application, Request, Response, Router } from 'express';
-import { Model, ModelCtor } from 'sequelize';
+import { FindOptions, Model, ModelCtor, Op, Order } from 'sequelize';
 import { ResponseBuilder } from '@utils/ResponseBuilder';
+import { posts } from '@data/index';
+
+const models = { posts };
 
 export default abstract class BaseApi<T extends Model> {
   protected router: Router;
@@ -17,16 +20,37 @@ export default abstract class BaseApi<T extends Model> {
 
   public abstract register(express: Application): void;
 
-  public async getAll(
-    req: Request,
-    res: Response,
-    orderBy?: string[],
-    searchBy?: { [key: string]: any },
-  ) {
-    const order: any = orderBy?.map(column => [column, 'ASC']) || [];
-    const where: any = searchBy ? { where: searchBy } : {};
-    const items = await this.model.findAll({ ...where, order });
-    return ResponseBuilder.successResponse(res, items, 200);
+  public async getAll(req: Request, res: Response) {
+    const { orderBy, searchBy, include } = req.query;
+    const options: FindOptions<{ order: Order }> = {};
+    const orderByArray = orderBy
+      ? Array.isArray(orderBy)
+        ? (orderBy as string[])
+        : [orderBy as string]
+      : [];
+
+    if (orderBy) {
+      options.order = orderByArray?.map(column => [column, 'ASC']) || [];
+    }
+    if (searchBy) {
+      options.where = {
+        [Op.or]: this.getSearchFields().map(field => ({
+          [field]: { [Op.substring]: searchBy },
+        })),
+      };
+    }
+    if (include) {
+      const includeModels = include.toString().split(',');
+      // @ts-ignore
+      options.include = includeModels.map(model => ({ model: models[model] }));
+    }
+
+    const results = await this.model.findAll(options);
+    return ResponseBuilder.successResponse(res, results, 200);
+  }
+
+  protected getSearchFields(): string[] {
+    return ['name', 'email'];
   }
 
   public async get(req: Request, res: Response) {

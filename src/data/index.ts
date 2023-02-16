@@ -6,10 +6,11 @@ const sequelize = new Sequelize({
   dialect: 'sqlite',
   storage: 'database.sqlite',
   models: [User, Post],
-  sync: {
-    alter: true,
-    force: true,
-  },
+  logging: false,
+  // sync: {
+  //   alter: true,
+  //   force: true,
+  // },
 });
 
 export async function connectDB() {
@@ -22,3 +23,5 @@ export async function connectDB() {
     console.error('Unable to connect to the database:', error);
   }
 }
+
+export { User as users, Post as posts };
