@@ -4,7 +4,7 @@ import { Application, Request, Response } from 'express';
 
 export class UserController extends BaseApi<User> {
   constructor(app: Application) {
-    super(User);
+    super(User, ['post', 'post.user', 'image', 'image.user']);
     this.register(app);
   }
 

@@ -1,11 +1,12 @@
 import { Sequelize } from 'sequelize-typescript';
 import User from '@data/user';
 import Post from '@data/post';
+import Image from './image';
 
 const sequelize = new Sequelize({
   dialect: 'sqlite',
   storage: 'database.sqlite',
-  models: [User, Post],
+  models: [User, Post, Image],
   logging: false,
   // sync: {
   //   alter: true,

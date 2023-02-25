@@ -1,17 +1,52 @@
 import { Application, Request, Response, Router } from 'express';
-import { FindOptions, Model, ModelCtor, Op, Order } from 'sequelize';
+import { Model, ModelCtor, Op, Order } from 'sequelize';
 import { ResponseBuilder } from '@utils/ResponseBuilder';
-import { posts } from '@data/index';
+import { posts, users } from '@data/index';
+import Image from '@data/image';
+import { BadRequestError } from './execptions';
 
-const models = { posts };
+const models = { posts, users };
+
+const modelMap: { [modelName: string]: any } = {
+  post: posts,
+  user: users,
+  image: Image,
+};
+
+function getIncludeParam(models: string[]): any {
+  const model = models[0];
+  let includeParam: any = {
+    model: modelMap[model],
+    include: [],
+  };
+
+  if (models.length > 1) {
+    includeParam.include.push(getIncludeParam(models.slice(1)));
+  }
+
+  return includeParam;
+}
+
+function getIncludeParams(includeString: string): any[] {
+  const includeArr = includeString.split(',');
+  const includeParams: any[] = includeArr.map(include => {
+    const models = include.split('.');
+    return getIncludeParam(models);
+  });
+  return includeParams;
+}
 
 export default abstract class BaseApi<T extends Model> {
   protected router: Router;
   private model: ModelCtor<T>;
 
-  protected constructor(model: ModelCtor<T>) {
+  private allowedIncludes: string[] = [];
+
+  protected constructor(model: ModelCtor<T>, allowedIncludes: string[]) {
     this.router = Router();
     this.model = model;
+
+    this.allowedIncludes = allowedIncludes;
 
     this.getAll = this.getAll.bind(this);
     this.get = this.get.bind(this);
@@ -21,32 +56,49 @@ export default abstract class BaseApi<T extends Model> {
   public abstract register(express: Application): void;
 
   public async getAll(req: Request, res: Response) {
-    const { orderBy, searchBy, include } = req.query;
-    const options: FindOptions<{ order: Order }> = {};
-    const orderByArray = orderBy
-      ? Array.isArray(orderBy)
-        ? (orderBy as string[])
-        : [orderBy as string]
-      : [];
+    // const { orderBy, searchBy, include } = req.query;
+    // const options: FindOptions<{ order: Order }> = {};
+    // const orderByArray = orderBy
+    //   ? Array.isArray(orderBy)
+    //     ? (orderBy as string[])
+    //     : [orderBy as string]
+    //   : [];
 
-    if (orderBy) {
-      options.order = orderByArray?.map(column => [column, 'ASC']) || [];
-    }
-    if (searchBy) {
-      options.where = {
-        [Op.or]: this.getSearchFields().map(field => ({
-          [field]: { [Op.substring]: searchBy },
-        })),
-      };
-    }
-    if (include) {
-      const includeModels = include.toString().split(',');
-      // @ts-ignore
-      options.include = includeModels.map(model => ({ model: models[model] }));
+    // if (orderBy) {
+    //   options.order = orderByArray?.map(column => [column, 'ASC']) || [];
+    // }
+    // if (searchBy) {
+    //   options.where = {
+    //     [Op.or]: this.getSearchFields().map(field => ({
+    //       [field]: { [Op.substring]: searchBy },
+    //     })),
+    //   };
+    // }
+    // if (include) {
+    //   const includeModels = include.toString().split(',');
+    //   // @ts-ignore
+    //   options.include = includeModels.map(model => ({ model: models[model] }));
+    // }
+
+    // const results = await this.model.findAll(options);
+    const includeString = req.query.include?.toString() || '';
+    const includesToCheck = ((req.query.include as string) || '').split(',');
+    const includeParams = getIncludeParams(includeString);
+    const extraIncludes = includesToCheck.filter(
+      include => !this.allowedIncludes.includes(include),
+    );
+    if (extraIncludes.length > 0) {
+      throw new BadRequestError(
+        `Invalid includes found: ${extraIncludes.join(', ')}, only ${this.allowedIncludes.join(
+          ', ',
+        )} are valid`,
+      );
     }
 
-    const results = await this.model.findAll(options);
-    return ResponseBuilder.successResponse(res, results, 200);
+    const posts = await users.findAll({
+      include: includeParams,
+    });
+    return ResponseBuilder.successResponse(res, posts, 200);
   }
 
   protected getSearchFields(): string[] {
