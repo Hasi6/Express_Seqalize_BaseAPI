@@ -7,6 +7,7 @@ export const errorHandler = (_err: Error, _req: Request, _res: Response, _next: 
       .status(_err.statusCode)
       .json({ errors: _err.serializeErrors(), success: false, data: null });
   }
+  console.error(_err);
   return _res.status(500).json({
     errors: [
       {

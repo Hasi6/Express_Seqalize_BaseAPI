@@ -1,4 +1,4 @@
-import { Model, Table, Column, BelongsToMany, ForeignKey } from 'sequelize-typescript';
+import { Model, Table, Column, ForeignKey, BelongsTo } from 'sequelize-typescript';
 
 import { Node } from '@data/node';
 import { Template } from '@data/template';
@@ -15,4 +15,10 @@ export class TemplateNode extends Model<TemplateNode> {
   @ForeignKey(() => Node)
   @Column
   nodeId!: number;
+
+  @BelongsTo(() => Node)
+  node!: Node;
+
+  @BelongsTo(() => Template)
+  template!: Template;
 }

@@ -13,4 +13,8 @@ export class Template extends Model<Template> {
 
   @BelongsToMany(() => Node, () => TemplateNode)
   nodes!: Node[];
+
+  public async addNode(nodeId: number) {
+    await TemplateNode.create({ nodeId, templateId: this.id } as any);
+  }
 }

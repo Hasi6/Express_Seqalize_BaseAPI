@@ -16,6 +16,8 @@ import { User } from '@data/user';
 import { Op } from 'sequelize';
 import { Post } from '@data/post';
 import { Image } from '@data/image';
+import { Template } from '@data/template';
+import { Node } from '@data/node';
 
 const app: Application = express();
 
@@ -93,4 +95,34 @@ const seed = async () => {
   ];
   await Post.bulkCreate(posts);
   await Image.bulkCreate(posts);
+
+  await Template.destroy({
+    where: {
+      id: {
+        [Op.ne]: 1000,
+      },
+    },
+  });
+
+  await Node.destroy({
+    where: {
+      id: {
+        [Op.ne]: 1000,
+      },
+    },
+  });
+
+  const node1 = new Node({ name: 'node1' } as any);
+  const node2 = new Node({ name: 'node2' } as any);
+  await node1.save();
+  await node2.save();
+
+  const template1: any = { name: 'template1' };
+  const template2: any = { name: 'template2' };
+  const [tm1, tm2] = await Template.bulkCreate([template1, template2]);
+
+  await tm1.addNode(node1.id);
+  await tm1.addNode(node2.id);
+  await tm2.addNode(node1.id);
+  await tm2.addNode(node2.id);
 };

@@ -4,8 +4,6 @@ import { ResponseBuilder } from '@utils/ResponseBuilder';
 import { posts, users, images, nodes, templates } from '@data/index';
 import { BadRequestError } from './execptions';
 
-const models = { posts, users };
-
 const modelMap: { [modelName: string]: any } = {
   post: posts,
   user: users,
@@ -34,7 +32,7 @@ function getIncludeParams(includeString: string): any[] {
     const models = include.split('.');
     return getIncludeParam(models);
   });
-  return includeParams;
+  return includeParams.filter(param => param.model);
 }
 
 export default abstract class BaseApi<T extends Model> {
@@ -88,7 +86,7 @@ export default abstract class BaseApi<T extends Model> {
     const extraIncludes = includesToCheck.filter(
       include => !this.allowedIncludes.includes(include),
     );
-    if (extraIncludes.length > 0) {
+    if (extraIncludes.length > 0 && extraIncludes[0] !== '') {
       throw new BadRequestError(
         `Invalid includes found: ${extraIncludes.join(', ')}, only ${this.allowedIncludes.join(
           ', ',
@@ -96,10 +94,10 @@ export default abstract class BaseApi<T extends Model> {
       );
     }
 
-    const posts = await users.findAll({
+    const data = await this.model.findAll({
       include: includeParams,
     });
-    return ResponseBuilder.successResponse(res, posts, 200);
+    return ResponseBuilder.successResponse(res, data, 200);
   }
 
   protected getSearchFields(): string[] {
