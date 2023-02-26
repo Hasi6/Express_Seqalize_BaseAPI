@@ -1,4 +1,4 @@
-import { Table, Column, Model, HasMany } from 'sequelize-typescript';
+import { Table, Column, Model, HasMany, BeforeCreate } from 'sequelize-typescript';
 import { Post } from '@data/post';
 import { Image } from '@data/image';
 
@@ -15,4 +15,9 @@ export class User extends Model<User> {
 
   @HasMany(() => Image)
   images!: Image[];
+
+  @BeforeCreate
+  static doSomething(instance: User) {
+    console.log(instance.get('name'));
+  }
 }
