@@ -1,8 +1,8 @@
 import { Table, Column, Model, BelongsTo, ForeignKey } from 'sequelize-typescript';
-import User from '@data/user';
+import { User } from '@data/user';
 
 @Table
-class Post extends Model<Post> {
+export class Post extends Model<Post> {
   @Column
   title!: string;
 
@@ -16,5 +16,3 @@ class Post extends Model<Post> {
   @BelongsTo(() => User)
   user!: User;
 }
-
-export default Post;

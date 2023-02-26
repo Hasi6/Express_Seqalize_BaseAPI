@@ -1,6 +1,7 @@
-import User from '@data/user';
-import BaseApi from '@utils/BaseApi';
 import { Application, Request, Response } from 'express';
+
+import { User } from '@data/user';
+import BaseApi from '@utils/BaseApi';
 
 export class UserController extends BaseApi<User> {
   constructor(app: Application) {

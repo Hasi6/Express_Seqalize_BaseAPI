@@ -1,8 +1,7 @@
 import { Application, Request, Response, Router } from 'express';
-import { Model, ModelCtor, Op, Order } from 'sequelize';
+import { Model, ModelCtor } from 'sequelize';
 import { ResponseBuilder } from '@utils/ResponseBuilder';
-import { posts, users } from '@data/index';
-import Image from '@data/image';
+import { posts, users, images, nodes, templates } from '@data/index';
 import { BadRequestError } from './execptions';
 
 const models = { posts, users };
@@ -10,7 +9,9 @@ const models = { posts, users };
 const modelMap: { [modelName: string]: any } = {
   post: posts,
   user: users,
-  image: Image,
+  image: images,
+  node: nodes,
+  template: templates,
 };
 
 function getIncludeParam(models: string[]): any {

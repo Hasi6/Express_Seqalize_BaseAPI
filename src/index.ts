@@ -12,10 +12,10 @@ import { NotFoundError } from '@utils/execptions';
 import { errorHandler } from '@middlewares/error-handler';
 import loggerObj from '@utils/logger';
 import { connectDB } from './data';
-import User from '@data/user';
+import { User } from '@data/user';
 import { Op } from 'sequelize';
-import Post from '@data/post';
-import Image from '@data/image';
+import { Post } from '@data/post';
+import { Image } from '@data/image';
 
 const app: Application = express();
 

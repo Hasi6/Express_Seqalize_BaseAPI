@@ -1,9 +1,9 @@
 import { Table, Column, Model, HasMany } from 'sequelize-typescript';
-import Post from '@data/post';
-import Image from '@data/image';
+import { Post } from '@data/post';
+import { Image } from '@data/image';
 
 @Table
-class User extends Model<User> {
+export class User extends Model<User> {
   @Column
   name!: string;
 
@@ -16,5 +16,3 @@ class User extends Model<User> {
   @HasMany(() => Image)
   images!: Image[];
 }
-
-export default User;
