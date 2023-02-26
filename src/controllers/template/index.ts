@@ -1,16 +1,16 @@
 import { Application } from 'express';
 
-import { TemplateNode } from '@data/template_node';
+import { Template } from '@data/template';
 import BaseApi from '@utils/BaseApi';
 
-export class TemplateNodeController extends BaseApi<TemplateNode> {
+export class TemplateController extends BaseApi<Template> {
   constructor(app: Application) {
-    super(TemplateNode, ['node', 'template']);
+    super(Template, ['template-node.template', 'node']);
     this.register(app);
   }
 
   public register(app: Application): void {
-    app.use('/api/v1/template-node', this.router);
+    app.use('/api/v1/template', this.router);
     this.router.get('/', this.getAll);
     this.router.post('/', this.create);
   }

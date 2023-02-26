@@ -1,7 +1,7 @@
 import { Application, Request, Response, Router } from 'express';
 import { Model, ModelCtor } from 'sequelize';
 import { ResponseBuilder } from '@utils/ResponseBuilder';
-import { posts, users, images, nodes, templates } from '@data/index';
+import { posts, users, images, nodes, templates, template_node } from '@data/index';
 import { BadRequestError } from './execptions';
 
 const modelMap: { [modelName: string]: any } = {
@@ -10,6 +10,7 @@ const modelMap: { [modelName: string]: any } = {
   image: images,
   node: nodes,
   template: templates,
+  'template-node': template_node,
 };
 
 function getIncludeParam(models: string[]): any {

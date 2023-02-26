@@ -28,4 +28,11 @@ export async function connectDB() {
   }
 }
 
-export { User as users, Post as posts, Image as images, Template as templates, Node as nodes };
+export {
+  User as users,
+  Post as posts,
+  Image as images,
+  Template as templates,
+  Node as nodes,
+  TemplateNode as template_node,
+};

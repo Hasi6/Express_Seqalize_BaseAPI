@@ -1,4 +1,4 @@
-import { BelongsToMany, Column, Model, Table } from 'sequelize-typescript';
+import { BelongsToMany, Column, HasMany, Model, Table } from 'sequelize-typescript';
 
 import { Template } from '@data/template';
 import { TemplateNode } from '@data/template_node';
@@ -13,4 +13,7 @@ export class Node extends Model<Node> {
 
   @BelongsToMany(() => Template, () => TemplateNode)
   templates!: Template[];
+
+  @HasMany(() => TemplateNode)
+  templateNodes!: TemplateNode[];
 }
